@@ -141,3 +141,13 @@ The first pass built the audit trail and only proposed the safety rules; they st
 Prompt typed:
 
 “Problem 13: Push to Github and submit the URL” (with screenshots of the required `hw4/` file layout, the local-only data pack, and the README / `.env.example` / `.gitignore` rules)
+
+Follow-up prompt:
+
+“Can you do whatever needs to be done for me?”
+
+What was lacking after the first prompt:
+
+The first pass prepared and committed the repo (layout, README, `.env.example`, `.gitignore`, secret scan) but could not push because GitHub wasn't set up on this computer; the follow-up had the vibe coder install the official GitHub CLI, run a browser sign-in that I approved myself, create the public `hw4` repo, and push.
+
+Repo URL: https://github.com/nnwokorie/hw4
