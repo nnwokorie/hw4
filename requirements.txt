@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+pillow
+pydantic-ai-slim[openai]
+python-dotenv

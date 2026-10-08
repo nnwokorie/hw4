@@ -1,0 +1,31 @@
+# Secrets (never commit)
+.env
+.env.*
+!.env.example
+backend/.session_secret
+
+# Data pack: database and product images (not allowed in the repo)
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
+backend/.venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Node / builds
+frontend/node_modules/
+frontend/dist/
+node_modules/
+
+# Audit trail scratch files (the trail itself is committed)
+output/audit_trail.lock
+output/audit_trail.tmp
+output/audit_trail.corrupt-*.json
+
+# OS / editor
+.DS_Store
+.claude/

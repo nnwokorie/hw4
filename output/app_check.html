@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Customs — Live App Check</title>
+<style>
+  :root { --yale: #00356b; --line: #dde3ec; --muted: #5b6878; --ok: #1a7f4b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, system-ui, "Segoe UI", sans-serif; color: #1b2430; background: #f6f8fb; line-height: 1.55; }
+  header { background: var(--yale); color: #fff; padding: 2rem 1.5rem; }
+  header h1 { margin: 0 0 0.3rem; font-family: Georgia, serif; font-weight: 400; font-size: 2rem; }
+  header p { margin: 0; opacity: 0.85; }
+  main { max-width: 980px; margin: 0 auto; padding: 1.5rem; }
+  nav.toc { background: #fff; border: 1px solid var(--line); padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+  nav.toc ol { margin: 0.3rem 0 0; padding-left: 1.2rem; }
+  nav.toc a { color: var(--yale); }
+  section.check { background: #fff; border: 1px solid var(--line); border-top: 4px solid var(--yale); padding: 1.5rem; margin-bottom: 1.75rem; }
+  section.check h2 { margin: 0 0 0.25rem; font-family: Georgia, serif; font-weight: 400; color: var(--yale); }
+  .pass { display: inline-block; background: #e6f4ec; color: var(--ok); font-weight: 700; font-size: 0.8rem; padding: 0.2rem 0.6rem; margin-bottom: 0.75rem; }
+  .ask { background: #f6f8fb; border-left: 3px solid var(--yale); padding: 0.5rem 0.8rem; margin: 0.5rem 0 1rem; font-size: 0.95rem; }
+  figure { margin: 0; }
+  figure img { width: 100%; border: 1px solid var(--line); display: block; }
+  figcaption { font-size: 0.95rem; margin-top: 0.75rem; }
+  table { border-collapse: collapse; margin-top: 0.9rem; font-size: 0.88rem; }
+  th, td { border: 1px solid var(--line); padding: 0.35rem 0.7rem; text-align: left; }
+  th { background: #eef3fa; color: var(--yale); }
+  .muted { color: var(--muted); font-size: 0.85rem; }
+  code { background: #eef3fa; padding: 0.05rem 0.3rem; font-size: 0.85em; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Campus Customs — Live App Check</h1>
+  <p>Tested on the running site (React + Vite front end on <code>localhost:5174</code>, FastAPI + PydanticAI backend on <code>localhost:8000</code>), logged in as the seed test user. Every number below was checked against <code>data/campus_customs.db</code>.</p>
+</header>
+<main>
+  <nav class="toc">
+    <strong>Checks</strong>
+    <ol>
+      <li><a href="#inventory">Chat checks an item's inventory (honest stock and price from the DB)</a></li>
+      <li><a href="#search">Dynamic search-result cards after a category question (hoodies)</a></li>
+      <li><a href="#usability">Usability feature from Problem 9: Products search, filter, and sort</a></li>
+      <li><a href="#bonus">Bonus: Problem 9 sold-out alternatives + fact-check badge</a></li>
+    </ol>
+  </nav>
+
+  <section class="check" id="inventory">
+    <h2>1. Chat checks an item's inventory level</h2>
+    <span class="pass">✓ PASS</span>
+    <div class="ask">On the <strong>Boola Boola T Shirt</strong> product page, the shopper asked: <em>"How many of this shirt do you have in each size, and what does it cost?"</em></div>
+    <figure>
+      <img src="app_check_images/inventory.png" alt="Chat reply listing Boola Boola T Shirt price and stock by size, with a verified badge">
+      <figcaption>The agent knew "this shirt" meant the page's product. It answered <strong>$32.00</strong> and <strong>XS 12, S 12, M 15, L sold out, XL 2 left, XXL 20</strong>, exactly matching the database, under a green "✓ Prices &amp; stock checked against live inventory" badge. This proves the answer came from the <code>check_stock</code> tool and passed the fact-check, not from the model's memory.</figcaption>
+    </figure>
+    <table>
+      <tr><th>DB: <code>catalogue</code> ⋈ <code>inventory</code></th><th>XS</th><th>S</th><th>M</th><th>L</th><th>XL</th><th>XXL</th><th>Price</th></tr>
+      <tr><td>boola-boola-t-shirt</td><td>12</td><td>12</td><td>15</td><td>0</td><td>2</td><td>20</td><td>$32.00</td></tr>
+    </table>
+  </section>
+
+  <section class="check" id="search">
+    <h2>2. Dynamic search-result cards after a category question</h2>
+    <span class="pass">✓ PASS</span>
+    <div class="ask">From the Home page, the shopper asked: <em>"What hoodies do you have?"</em></div>
+    <figure>
+      <img src="app_check_images/search_cards.png" alt="Hoodies results grid with 27 product cards next to the chat reply">
+      <figcaption>The agent returned structured matches (<code>{title, product_ids}</code>), and the site rendered a <strong>"Hoodies · 27 items"</strong> grid of product cards (image, name, price, short description, in-stock sizes) on the page. The reply's "<strong>27 hoodies, from $45.00 to $88.00</strong>" matches the DB (27 hoodie-type products, min $45, max $88).</figcaption>
+    </figure>
+    <figure style="margin-top:1.25rem">
+      <img src="app_check_images/search_click.png" alt="Basic Hoodie Big Yale product page opened from a result card">
+      <figcaption>Clicking the first result card (<strong>Basic Hoodie Big Yale</strong>) opened the same single-item page as the Products page uses (<code>/products/basic-hoodie-big-yale</code>): large image, description, $68.00, colors, and size buttons.</figcaption>
+    </figure>
+  </section>
+
+  <section class="check" id="usability">
+    <h2>3. Usability feature: Products search, filter, and sort</h2>
+    <span class="pass">✓ PASS</span>
+    <div class="ask">On Products, the shopper clicked <strong>Hoodies</strong>, chose <strong>In stock in M</strong>, and sorted <strong>Price: Low to High</strong>.</div>
+    <figure>
+      <img src="app_check_images/usability_filters.png" alt="Products page filtered to hoodies in stock in M sorted by price">
+      <figcaption>Three clicks narrowed 102 items to <strong>"Showing 21 of 102"</strong>, cheapest first ($45.00 Ua Gameday Double Knit Hood and Yale Sports Hoodie Tennis). Every card is in stock in M, with honest badges like "Sold out in L, XL". The DB confirms 21 hoodies with M quantity &gt; 0, and those two are the cheapest.</figcaption>
+    </figure>
+  </section>
+
+  <section class="check" id="bonus">
+    <h2>4. Bonus: sold-out alternatives + fact-check badge (Problem 9)</h2>
+    <span class="pass">✓ PASS</span>
+    <div class="ask">On the <strong>Baseball Left Chest Crewneck</strong> page, the shopper asked: <em>"Do you have this in XL?"</em></div>
+    <figure>
+      <img src="app_check_images/usability_soldout.png" alt="Chat says XL is sold out and shows three crewnecks in stock in XL">
+      <figcaption>The agent said clearly that XL is <strong>sold out</strong>, then offered 3 similar crewnecks that <em>are</em> in stock in XL, shown on the page as "Crewnecks in stock in XL". The reply carries the ✓ fact-check badge.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Product (DB)</th><th>XL qty</th><th>Price</th></tr>
+      <tr><td>Baseball Left Chest Crewneck</td><td>0</td><td>$58.00</td></tr>
+      <tr><td>Hype And Vice Yale University Offside Crewneck</td><td>20</td><td>$58.00</td></tr>
+      <tr><td>Super Heavyweight Crewneck Arched Yale Crest</td><td>25</td><td>$58.00</td></tr>
+      <tr><td>Champion Mens Triumph Raglan Crew</td><td>2</td><td>$58.00</td></tr>
+    </table>
+  </section>
+
+  <p class="muted">Bug found and fixed during this check: the first "What hoodies do you have?" run said "23 hoodies" (the DB has 27) and showed only 24 cards. The fact-checker now also verifies item counts ("27 hoodies") against the search's <code>total_matches</code>, and the page-results cap was raised from 24 to 30 so a full category fits. The re-run above is correct.</p>
+</main>
+</body>
+</html>
